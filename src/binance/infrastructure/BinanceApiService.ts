@@ -1,12 +1,10 @@
 import axios from 'axios';
 import { IMarketDataProvider } from '../domain/ports/IMarketDataProvider';
-import {
-  CryptoPrice,
-  OrderBook,
-  RecentTrade,
-} from '../domain/entities/MarketData';
 import { BinanceMapper } from './BinanceMapper';
 import { BinanceTicker, BinanceDepth, BinanceTrade } from './BinanceTypes';
+import { MarketPrice } from '../domain/entities/market-price.entity';
+import { OrderBook } from '../domain/entities/order-book.entity';
+import { RecentTrade } from '../domain/entities/trade.entity';
 
 export class BinanceApiService implements IMarketDataProvider {
   private readonly baseUrl = 'https://api.binance.com/api/v3';
@@ -16,7 +14,7 @@ export class BinanceApiService implements IMarketDataProvider {
     return response.data;
   }
 
-  async getPrice(symbol: string): Promise<CryptoPrice> {
+  async getPrice(symbol: string): Promise<MarketPrice> {
     const raw = await this.get<BinanceTicker>(`/ticker/price?symbol=${symbol}`);
     return BinanceMapper.toDomainPrice(raw);
   }

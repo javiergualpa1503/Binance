@@ -1,13 +1,11 @@
-import {
-  CryptoPrice,
-  OrderBook,
-  RecentTrade,
-} from '../domain/entities/MarketData';
+import { MarketPrice } from '../domain/entities/market-price.entity';
+import { OrderBook } from '../domain/entities/order-book.entity';
+import { RecentTrade } from '../domain/entities/trade.entity';
 import { BinanceTicker, BinanceDepth, BinanceTrade } from './BinanceTypes';
 
 export class BinanceMapper {
-  static toDomainPrice(raw: BinanceTicker): CryptoPrice {
-    return new CryptoPrice(raw.symbol, parseFloat(raw.price));
+  static toDomainPrice(raw: BinanceTicker): MarketPrice {
+    return new MarketPrice(raw.symbol, parseFloat(raw.price));
   }
 
   static toDomainOrderBook(raw: BinanceDepth): OrderBook {

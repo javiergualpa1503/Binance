@@ -1,6 +1,6 @@
-import { MarketPrice } from '../domain/entities/market-price.entity';
-import { OrderBook } from '../domain/entities/order-book.entity';
-import { RecentTrade } from '../domain/entities/trade.entity';
+import { MarketPrice } from '../domain/entities/MarketPrice';
+import { OrderBook } from '../domain/entities/OrderBook';
+import { RecentTrade } from '../domain/entities/RecentTrade';
 import { BinanceTicker, BinanceDepth, BinanceTrade } from './BinanceTypes';
 
 export class BinanceMapper {

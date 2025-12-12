@@ -1,4 +1,4 @@
-import { IMarketDataProvider } from '../domain/ports/IMarketDataProvider';
+/* import { IMarketDataPort } from '../domain/ports/IMarketDataPort';
 
 export interface MarketSummaryDTO {
   asset: string;
@@ -29,3 +29,4 @@ export class GetMarketSummaryUseCase {
     };
   }
 }
+ */

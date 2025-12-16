@@ -14,7 +14,6 @@ import { GetTradesUseCase } from './application/use-cases/GetTradesUseCase';
       provide: 'IMarketDataPort',
       useClass: BinanceRestAdapter,
     },
-
     GetPriceUseCase,
     GetOrderBookUseCase,
     GetTradesUseCase,

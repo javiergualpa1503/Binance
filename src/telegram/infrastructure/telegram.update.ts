@@ -27,7 +27,7 @@ export class TelegramUpdate {
       return ctx.reply('❌ Escribe un símbolo. Ej: /price BTCUSDT');
     }
 
-    await ctx.reply(`📈 Consultando precio de ${symbol}...`);
+    await ctx.reply(`📈 Consultando precio de ${symbol}`);
   }
 
   @On('text')

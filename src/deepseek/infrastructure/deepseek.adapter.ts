@@ -1,23 +1,12 @@
 import { Injectable } from '@nestjs/common';
-import { IDeepSeekProvider } from '../domain/ports/IDeepSeekProvider';
+import { DeepSeekPort } from '../domain/ports/DeepSeekPort';
 import axios from 'axios';
 import { ConfigService } from '@nestjs/config';
-
-interface DeepSeekResponse {
-  id: string;
-  choices: Array<{
-    message: {
-      role: string;
-      content: string;
-    };
-    finish_reason: string;
-  }>;
-  created: number;
-  model: string;
-}
+import { DeepSeekResponse } from '../domain/entities/deepseek.entity';
+import { DeepSeekResponseApi } from './interfaces/DeepSeekResponse';
 
 @Injectable()
-export class DeepSeekApiService implements IDeepSeekProvider {
+export class DeepSeekAdapter implements DeepSeekPort {
   private readonly API_URL = 'https://api.deepseek.com/v1/chat/completions';
   private readonly API_KEY: string;
 
@@ -25,8 +14,8 @@ export class DeepSeekApiService implements IDeepSeekProvider {
     this.API_KEY = this.configService.get<string>('DEEPSEEK_API_KEY')!;
   }
 
-  async sendPrompt(prompt: string): Promise<string> {
-    const response = await axios.post<DeepSeekResponse>(
+  async generateAnalysis(prompt: string): Promise<DeepSeekResponse> {
+    const response = await axios.post<DeepSeekResponseApi>(
       this.API_URL,
       {
         model: 'deepseek-chat',
@@ -40,6 +29,6 @@ export class DeepSeekApiService implements IDeepSeekProvider {
       },
     );
 
-    return response.data.choices[0].message.content;
+    return new DeepSeekResponse(response.data.choices[0].message.content);
   }
 }

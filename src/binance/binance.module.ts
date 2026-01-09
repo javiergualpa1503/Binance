@@ -4,7 +4,6 @@ import { BinanceRestAdapter } from './infrastructure/rest/BinanceRestAdapter';
 import { MarketDataUseCases } from './application/use-cases/MarketDataUseCase';
 
 @Module({
-  imports: [],
   controllers: [BinanceController],
   providers: [
     {
@@ -13,5 +12,6 @@ import { MarketDataUseCases } from './application/use-cases/MarketDataUseCase';
     },
     MarketDataUseCases,
   ],
+  exports: ['MarketDataPort'],
 })
 export class BinanceModule {}

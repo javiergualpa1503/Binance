@@ -21,12 +21,17 @@ export class TelegramUpdate {
   async price(@Ctx() ctx: Context, @Message('text') text: string) {
     console.log(text);
     const parts = text.split(' ');
+    const chatId = ctx.chat?.id;
     const symbol = parts[1];
 
     if (!symbol) {
       return ctx.reply('❌ Escribe un símbolo. Ej: /price BTCUSDT');
     }
+    if (!chatId) return; //
 
-    await ctx.reply(this.telegramService.getPriceMessage(symbol));
+    const message = await this.telegramService.notifyPrice(ctx.chat.id, symbol);
+    console.log(message);
+
+    await ctx.reply(message);
   }
 }

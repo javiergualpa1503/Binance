@@ -1,8 +1,15 @@
 import { Injectable } from '@nestjs/common';
 import { TelegramBotPort } from '../domain/ports/telegram-bot.port';
+import { Telegraf } from 'telegraf';
+import { InjectBot } from 'nestjs-telegraf';
 
 @Injectable()
 export class TelegramService implements TelegramBotPort {
+  constructor(
+    @InjectBot()
+    private readonly bot: Telegraf,
+  ) {}
+
   getStartBotMessage(): string {
     return 'Hola Bienvenido al servicio de Telegram + DeepSeek + Telegram';
   }
@@ -17,5 +24,11 @@ export class TelegramService implements TelegramBotPort {
 
   getPriceMessage(symbol: string): string {
     return `📈  Consultando precio de ${symbol}`;
+  }
+
+  async notifyPrice(chatId: number, symbol: string) {
+    await this.bot.telegram.sendMessage(chatId, symbol);
+
+    return `Notificando precio de ${symbol} a ${chatId}`;
   }
 }

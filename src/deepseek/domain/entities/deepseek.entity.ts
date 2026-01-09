@@ -1,1 +1,3 @@
-export class Deepseek {}
+export class DeepSeekResponse {
+  constructor(public readonly content: string) {}
+}

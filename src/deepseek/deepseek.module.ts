@@ -1,18 +1,18 @@
 import { Module } from '@nestjs/common';
 import { DeepSeekController } from './deepseek.controller';
-import { DeepSeekApiService } from './infrastructure/deepseek.service';
+import { DeepSeekAdapter } from './infrastructure/deepseek.adapter';
 import { AnalyzeMarketUseCase } from './application/AnalyzeMarketUseCase';
+import { BinanceModule } from 'src/binance/binance.module';
 
 @Module({
+  imports: [BinanceModule],
   controllers: [DeepSeekController],
   providers: [
-    DeepSeekApiService,
     {
-      provide: 'IDeepSeekProvider',
-      useExisting: DeepSeekApiService,
+      provide: 'DeepSeekPort',
+      useClass: DeepSeekAdapter,
     },
     AnalyzeMarketUseCase,
   ],
-  exports: ['IDeepSeekProvider', AnalyzeMarketUseCase],
 })
 export class DeepSeekModule {}

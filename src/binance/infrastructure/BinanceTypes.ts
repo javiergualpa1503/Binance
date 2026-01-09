@@ -13,3 +13,15 @@ export interface BinanceTrade {
   qty: string;
   time: number;
 }
+
+export interface BinancePriceWs {
+  e: string; // Event type
+  E: number; // Event time
+  s: string; // Symbol
+  t: number; // Trade ID
+  p: string; // Price
+  q: string; // Quantity
+  T: number; // Trade time
+  m: boolean; // Is the buyer the market maker?
+  M: boolean; // Ignore
+}

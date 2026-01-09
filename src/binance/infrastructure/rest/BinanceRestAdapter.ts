@@ -1,14 +1,14 @@
 import axios from 'axios';
-import { IMarketDataPort } from '../../domain/ports/IMarketDataPort';
+import { MarketDataPort } from '../../domain/ports/MarketDataPort';
 import { BinanceMapper } from '../BinanceMapper';
 import { BinanceTicker, BinanceDepth, BinanceTrade } from '../BinanceTypes';
-import { MarketPrice } from '../../domain/entities/MarketPrice';
+import { Price } from '../../domain/entities/Price';
 import { OrderBook } from '../../domain/entities/OrderBook';
-import { RecentTrade } from '../../domain/entities/RecentTrade';
+import { Trade } from '../../domain/entities/Trade';
 import { Injectable } from '@nestjs/common';
 
 @Injectable()
-export class BinanceRestAdapter implements IMarketDataPort {
+export class BinanceRestAdapter implements MarketDataPort {
   private readonly baseUrl = 'https://api.binance.com/api/v3';
 
   private async get<T>(endpoint: string): Promise<T> {
@@ -16,7 +16,8 @@ export class BinanceRestAdapter implements IMarketDataPort {
     return response.data;
   }
 
-  async getPrice(symbol: string): Promise<MarketPrice> {
+  async getPrice(symbol: string): Promise<Price> {
+    console.log(`Fetching price for ${symbol}`);
     const raw = await this.get<BinanceTicker>(`/ticker/price?symbol=${symbol}`);
     return BinanceMapper.toDomainPrice(raw);
   }
@@ -26,7 +27,7 @@ export class BinanceRestAdapter implements IMarketDataPort {
     return BinanceMapper.toDomainOrderBook(raw);
   }
 
-  async getRecentTrades(symbol: string): Promise<RecentTrade[]> {
+  async getTrades(symbol: string): Promise<Trade[]> {
     const raw = await this.get<BinanceTrade[]>(
       `/trades?symbol=${symbol}&limit=5`,
     );

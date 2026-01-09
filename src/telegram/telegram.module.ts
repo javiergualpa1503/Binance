@@ -2,6 +2,7 @@ import { Module } from '@nestjs/common';
 import { TelegrafModule } from 'nestjs-telegraf';
 import { TelegramUpdate } from './infrastructure/telegram.update';
 import { ConfigService } from '@nestjs/config';
+import { TelegramService } from './infrastructure/telegram.service';
 
 @Module({
   imports: [
@@ -12,6 +13,6 @@ import { ConfigService } from '@nestjs/config';
       }),
     }),
   ],
-  providers: [TelegramUpdate],
+  providers: [TelegramUpdate, TelegramService],
 })
 export class TelegramModule {}

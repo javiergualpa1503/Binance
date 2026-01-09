@@ -1,29 +1,21 @@
 import { Controller, Get, Param } from '@nestjs/common';
-import {
-  GetPriceUseCase,
-  GetOrderBookUseCase,
-  GetTradesUseCase,
-} from './application/use-cases';
+import { MarketDataUseCases } from './application/use-cases/MarketDataUseCase';
 @Controller('binance')
 export class BinanceController {
-  constructor(
-    private readonly getPrice: GetPriceUseCase,
-    private readonly getOrderBook: GetOrderBookUseCase,
-    private readonly getTrades: GetTradesUseCase,
-  ) {}
+  constructor(private readonly marketDataUseCases: MarketDataUseCases) {}
 
   @Get(':symbol/price')
   getPriceEndpoint(@Param('symbol') symbol: string) {
-    return this.getPrice.execute(symbol);
+    return this.marketDataUseCases.getPrice(symbol);
   }
 
   @Get(':symbol/orderbook')
   getOrderBookEndpoint(@Param('symbol') symbol: string) {
-    return this.getOrderBook.execute(symbol);
+    return this.marketDataUseCases.getOrderBook(symbol);
   }
 
   @Get(':symbol/trades')
   getTradesEndpoint(@Param('symbol') symbol: string) {
-    return this.getTrades.execute(symbol);
+    return this.marketDataUseCases.getTrades(symbol);
   }
 }

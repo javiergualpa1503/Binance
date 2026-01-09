@@ -1,4 +1,4 @@
-export class RecentTrade {
+export class Trade {
   constructor(
     public readonly price: number,
     public readonly qty: number,

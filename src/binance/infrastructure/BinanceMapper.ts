@@ -1,11 +1,11 @@
-import { MarketPrice } from '../domain/entities/MarketPrice';
+import { Price } from '../domain/entities/Price';
 import { OrderBook } from '../domain/entities/OrderBook';
-import { RecentTrade } from '../domain/entities/RecentTrade';
+import { Trade } from '../domain/entities/Trade';
 import { BinanceTicker, BinanceDepth, BinanceTrade } from './BinanceTypes';
 
 export class BinanceMapper {
-  static toDomainPrice(raw: BinanceTicker): MarketPrice {
-    return new MarketPrice(raw.symbol, parseFloat(raw.price));
+  static toDomainPrice(raw: BinanceTicker): Price {
+    return new Price(raw.symbol, parseFloat(raw.price));
   }
 
   static toDomainOrderBook(raw: BinanceDepth): OrderBook {
@@ -15,14 +15,10 @@ export class BinanceMapper {
     );
   }
 
-  static toDomainTrades(rawTrades: BinanceTrade[]): RecentTrade[] {
+  static toDomainTrades(rawTrades: BinanceTrade[]): Trade[] {
     return rawTrades.map(
       (t) =>
-        new RecentTrade(
-          parseFloat(t.price),
-          parseFloat(t.qty),
-          new Date(t.time),
-        ),
+        new Trade(parseFloat(t.price), parseFloat(t.qty), new Date(t.time)),
     );
   }
 }

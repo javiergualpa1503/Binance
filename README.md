@@ -180,7 +180,6 @@ NestJS levantará la aplicación en modo watch.
 - Arquitectura limpia y desacoplada
 - Streams controlados bajo demanda
 - Evitar spam y límites (429 Telegram)
-- Fácil extensión (nuevos exchanges, nuevos bots)
 
 ---
 

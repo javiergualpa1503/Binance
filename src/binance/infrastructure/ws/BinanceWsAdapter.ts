@@ -1,31 +1,58 @@
 import { Injectable } from '@nestjs/common';
 import WebSocket from 'ws';
-import { BinancePriceWs } from '../BinanceTypes';
+import { Subject, Observable } from 'rxjs';
+import { MarketStreamPort } from 'src/binance/domain/ports/MarketStreamPort';
 
 @Injectable()
-export class BinanceWsService {
+export class BinanceWsAdapter implements MarketStreamPort {
   private ws?: WebSocket;
+  private connected = false;
+
+  private priceSubject = new Subject<number>();
+  price$ = this.priceSubject.asObservable();
 
   connect(symbol: string) {
-    if (this.ws) return; // evita duplicados
+    if (this.connected) return;
 
-    this.ws = new WebSocket(
-      `wss://stream.binance.com:9443/ws/${symbol.toLowerCase()}@trade`,
-    );
+    this.ws = new WebSocket(`wss://stream.binance.com:9443/ws/${symbol}@trade`);
+
+    this.ws.on('open', () => {
+      this.connected = true;
+      console.log('🟢 Binance WS conectado');
+    });
 
     this.ws.on('message', (data) => {
-      if (!Buffer.isBuffer(data)) return;
+      let text: string;
 
-      const payload = JSON.parse(data.toString('utf8')) as BinancePriceWs;
+      if (Buffer.isBuffer(data)) {
+        text = data.toString('utf-8');
+      } else if (Array.isArray(data)) {
+        text = Buffer.concat(data).toString('utf-8');
+      } else if (data instanceof ArrayBuffer) {
+        text = Buffer.from(data).toString('utf-8');
+      } else {
+        return;
+      }
 
-      const price = Number(payload.p);
+      const parsed = JSON.parse(text) as { p: string };
+      this.priceSubject.next(Number(parsed.p));
+    });
 
-      console.log(`📈 ${symbol}:`, price);
+    this.ws.on('close', () => {
+      this.connected = false;
+      console.log('🔴 Binance WS cerrado');
     });
   }
 
   disconnect() {
-    this.ws?.close();
-    this.ws = undefined;
+    if (!this.ws) return;
+    this.ws.close();
+    this.connected = false;
+  }
+  getPriceStream(): Observable<number> {
+    return this.price$;
+  }
+  isConnected() {
+    return this.connected;
   }
 }

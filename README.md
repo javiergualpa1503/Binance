@@ -1,98 +1,191 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="120" alt="Nest Logo" /></a>
-</p>
+# 📈 Binance Market Bot (NestJS + Hexagonal Architecture)
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+Este proyecto es una **plataforma de análisis y monitoreo de mercados en tiempo real** construida con **NestJS** siguiendo **Arquitectura Hexagonal (Ports & Adapters)**.
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg" alt="Donate us"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow" alt="Follow us on Twitter"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+Integra:
 
-## Description
+- **Binance** (REST + WebSocket) para datos de mercado
+- **Telegram Bot** para interacción en tiempo real
+- **DeepSeek** para análisis de mercado basado en datos
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+El objetivo principal es **consultar precios, escuchar mercados en tiempo real y generar análisis**, todo desacoplado y escalable.
 
-## Project setup
+---
 
-```bash
-$ npm install
+## 🧠 Arquitectura General
+
+La aplicación está organizada en **capas bien definidas**:
+
+```
+┌──────────────────────────┐
+│      Infraestructura     │
+│  (Controllers / WS / Bot)│
+└──────────▲───────────────┘
+           │
+┌──────────┴───────────────┐
+│        Aplicación        │
+│        (Use Cases)       │
+└──────────▲───────────────┘
+           │
+┌──────────┴───────────────┐
+│          Dominio         │
+│     (Ports / Entities)   │
+└──────────────────────────┘
 ```
 
-## Compile and run the project
+### 🔹 Dominio
 
-```bash
-# development
-$ npm run start
+- Define **contratos (Ports)**
+- No depende de frameworks ni APIs externas
 
-# watch mode
-$ npm run start:dev
+### 🔹 Aplicación
 
-# production mode
-$ npm run start:prod
+- Contiene los **casos de uso**
+- Orquesta la lógica del negocio
+
+### 🔹 Infraestructura
+
+- Implementaciones concretas:
+  - Binance REST
+  - Binance WebSocket
+  - Telegram Bot
+  - DeepSeek API
+
+---
+
+## 🔌 Integraciones
+
+### 🟡 Binance
+
+#### REST API
+
+- Obtener precios actuales
+- Obtener últimos trades
+- Obtener order book
+
+**Endpoints:**
+
+```
+/binance/:symbol/price
+/binance/:symbol/trades
+/binance/:symbol/order-book
 ```
 
-## Run tests
+#### WebSocket (Tiempo real)
 
-```bash
-# unit tests
-$ npm run test
+- Escucha precios en tiempo real
+- Controlado bajo demanda (no siempre activo)
 
-# e2e tests
-$ npm run test:e2e
+---
 
-# test coverage
-$ npm run test:cov
+### 🟣 DeepSeek
+
+Servicio de **análisis de mercado** que combina:
+
+- Datos de Binance
+- Procesamiento inteligente
+
+**Endpoint:**
+
+```
+/deepseek/:symbol/analyze
 ```
 
-## Deployment
+---
 
-When you're ready to deploy your NestJS application to production, there are some key steps you can take to ensure it runs as efficiently as possible. Check out the [deployment documentation](https://docs.nestjs.com/deployment) for more information.
+### 🟢 Telegram Bot
 
-If you are looking for a cloud-based platform to deploy your NestJS application, check out [Mau](https://mau.nestjs.com), our official platform for deploying NestJS applications on AWS. Mau makes deployment straightforward and fast, requiring just a few simple steps:
+Permite interactuar con el sistema desde Telegram.
 
-```bash
-$ npm install -g @nestjs/mau
-$ mau deploy
+#### Comandos disponibles:
+
+```
+/start        → Inicia el bot
+/help         → Ayuda
+/price        → Obtiene el precio actual
+/startprice   → Inicia stream en tiempo real
+/endprice     → Detiene el stream
 ```
 
-With Mau, you can deploy your application in just a few clicks, allowing you to focus on building features rather than managing infrastructure.
+📡 El envío de precios en tiempo real utiliza:
 
-## Resources
+- Binance WebSocket
+- RxJS
+- Control de throttling para evitar spam
 
-Check out a few resources that may come in handy when working with NestJS:
+---
 
-- Visit the [NestJS Documentation](https://docs.nestjs.com) to learn more about the framework.
-- For questions and support, please visit our [Discord channel](https://discord.gg/G7Qnnhy).
-- To dive deeper and get more hands-on experience, check out our official video [courses](https://courses.nestjs.com/).
-- Deploy your application to AWS with the help of [NestJS Mau](https://mau.nestjs.com) in just a few clicks.
-- Visualize your application graph and interact with the NestJS application in real-time using [NestJS Devtools](https://devtools.nestjs.com).
-- Need help with your project (part-time to full-time)? Check out our official [enterprise support](https://enterprise.nestjs.com).
-- To stay in the loop and get updates, follow us on [X](https://x.com/nestframework) and [LinkedIn](https://linkedin.com/company/nestjs).
-- Looking for a job, or have a job to offer? Check out our official [Jobs board](https://jobs.nestjs.com).
+## 🧩 Casos de Uso Principales
 
-## Support
+### 📌 Market Data (Binance REST)
 
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
+- Consultar precio
+- Consultar trades
+- Consultar order book
 
-## Stay in touch
+### 📌 Market Stream (Binance WS)
 
-- Author - [Kamil Myśliwiec](https://twitter.com/kammysliwiec)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
+- Conectarse a un símbolo
+- Escuchar precios
+- Desconectarse bajo demanda
 
-## License
+### 📌 Telegram Streaming
 
-Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).
+- Escuchar precios
+- Enviar mensajes periódicos
+- Manejo de suscripciones y límites
+
+### 📌 DeepSeek Analysis
+
+- Análisis del mercado
+- Fusión de datos Binance + IA
+
+---
+
+## ⚙️ Tecnologías Usadas
+
+- **NestJS**
+- **TypeScript**
+- **RxJS**
+- **WebSocket (Binance)**
+- **Telegraf (Telegram Bot)**
+- **Arquitectura Hexagonal**
+
+---
+
+## ▶️ Ejecución del Proyecto (Local)
+
+Este proyecto está pensado para ejecutarse **en entorno local**.
+
+### 📦 Instalación de dependencias
+
+```bash
+npm install
+```
+
+### ▶️ Ejecutar en modo desarrollo
+
+```bash
+npm run start:dev
+```
+
+NestJS levantará la aplicación en modo watch.
+
+⚠️ Asegúrate de tener configuradas tus variables de entorno (por ejemplo tokens de Binance y Telegram).
+
+---
+
+## 🚀 Objetivos del Proyecto
+
+- Arquitectura limpia y desacoplada
+- Streams controlados bajo demanda
+- Evitar spam y límites (429 Telegram)
+- Fácil extensión (nuevos exchanges, nuevos bots)
+
+---
+
+## 👨‍💻 Autor
+
+**Javier Gualpa**
+
+Proyecto de práctica avanzada con enfoque en **backend, arquitectura y sistemas en tiempo real**.

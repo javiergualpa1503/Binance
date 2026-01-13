@@ -1,10 +1,15 @@
 import { Update, Start, Help, Command, Ctx, Message } from 'nestjs-telegraf';
 import { Context } from 'telegraf';
 import { TelegramService } from './telegram.service';
+import { MarketDataStreamUseCases } from 'src/binance/application/use-cases/MarketDataStreamUseCase';
+import { throttleTime } from 'rxjs/internal/operators/throttleTime';
 
 @Update()
 export class TelegramUpdate {
-  constructor(private readonly telegramService: TelegramService) {}
+  constructor(
+    private readonly telegramService: TelegramService,
+    private readonly binanceWs: MarketDataStreamUseCases,
+  ) {}
 
   @Start()
   async start(@Ctx() ctx: Context) {
@@ -17,21 +22,35 @@ export class TelegramUpdate {
     await ctx.reply(this.telegramService.getHelpMessage());
   }
 
-  @Command('price')
-  async price(@Ctx() ctx: Context, @Message('text') text: string) {
+  @Command('startprice')
+  async startPrice(@Ctx() ctx: Context, @Message('text') text: string) {
     console.log(text);
     const parts = text.split(' ');
-    const chatId = ctx.chat?.id;
     const symbol = parts[1];
-
+    this.binanceWs.connectToPriceStream('btcusdt');
     if (!symbol) {
       return ctx.reply('❌ Escribe un símbolo. Ej: /price BTCUSDT');
     }
-    if (!chatId) return; //
 
-    const message = await this.telegramService.notifyPrice(ctx.chat.id, symbol);
-    console.log(message);
+    await ctx.reply('📡 Escuchando precio de BTC en tiempo real');
+  }
 
-    await ctx.reply(message);
+  @Command('price')
+  async price(ctx: Context) {
+    if (!this.binanceWs.isConnected()) {
+      return ctx.reply('❌ El WS no está conectado. Usa /startprice');
+    }
+    this.binanceWs
+      .getPriceStream()
+      .pipe(throttleTime(5000))
+      .subscribe((price) => {
+        void ctx.reply(`💰 precio recibido: ${price}`);
+      });
+  }
+
+  @Command('endprice')
+  async endPrice(@Ctx() ctx: Context) {
+    this.binanceWs.disconnectFromPriceStream();
+    await ctx.reply('🛑 Desconectado del stream de precios');
   }
 }

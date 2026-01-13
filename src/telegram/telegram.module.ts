@@ -3,9 +3,11 @@ import { TelegrafModule } from 'nestjs-telegraf';
 import { TelegramUpdate } from './infrastructure/telegram.update';
 import { ConfigService } from '@nestjs/config';
 import { TelegramService } from './infrastructure/telegram.service';
+import { BinanceModule } from 'src/binance/binance.module';
 
 @Module({
   imports: [
+    BinanceModule,
     TelegrafModule.forRootAsync({
       inject: [ConfigService],
       useFactory: (config: ConfigService) => ({

@@ -5,7 +5,7 @@ import { AnalyzeMarketUseCase } from './application/AnalyzeMarketUseCase';
 export class DeepSeekController {
   constructor(private readonly analyzeMarket: AnalyzeMarketUseCase) {}
 
-  @Get(':symbol')
+  @Get(':symbol/analyze')
   analyze(@Param('symbol') symbol: string) {
     return this.analyzeMarket.execute(symbol);
   }
